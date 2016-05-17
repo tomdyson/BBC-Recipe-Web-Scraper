@@ -167,14 +167,21 @@ def save_pages(css_links):
             for ele in decomp:
                 if ele:
                     ele.decompose()
+
+            ## Convert anchor tags into spans (links into text)
+            tags = []
+            for tag in soup.find_all('a'):
+                tags.append(tag)
+            for tag in tags:
+                new_tag = soup.new_tag('span')
+                new_tag.string = tag.text
+                tag.replace_with(new_tag)
+
             ## Convert the soup back into html and save it to file
             html = soup.prettify()
 
             with open('BBC_Food_Repo/' + line.split('/')[-1] + '.html', 'w', encoding='utf-8-sig') as html_page:
                 html_page.write(html)
-            i = i + 1
-            if i >= 10:
-                break
 
 
 def main():
