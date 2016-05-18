@@ -14,7 +14,7 @@
 #-------------------------------------------------------------------------------
 
 
-import bs4, os, requests, time
+import bs4, os, requests, time, io
 
 
 def get_sitemap():
@@ -52,13 +52,13 @@ def make_repodir():
     Make the repositories where the html and css files will be stored
     '''
     ## Create the location where the CSS will be stored
-    cwd = os.getcwd()
+    cwd = os.getcwd() + os.sep
 
     try:
-        if not os.path.isdir(cwd + '\\BBC_Food_Repo'):
-            os.mkdir(cwd + '\\BBC_Food_Repo')
-        if not os.path.isdir(cwd + '\\BBC_Food_Repo\\css'):
-            os.mkdir(cwd + '\\BBC_Food_Repo\\css')
+        if not os.path.isdir(cwd + 'BBC_Food_Repo'):
+            os.mkdir(cwd + 'BBC_Food_Repo')
+        if not os.path.isdir(cwd + 'BBC_Food_Repo' + os.sep + 'css'):
+            os.mkdir(cwd + 'BBC_Food_Repo' + os.sep + 'css')
     except Exception as e:
         raise Exception(str(e))
 
@@ -105,7 +105,7 @@ def get_stylesheets():
         except requests.RequestException:
             continue
 
-        with open('BBC_Food_Repo\\css\\' + link.split('/')[-1], 'w', encoding='utf-8') as css:
+        with io.open('BBC_Food_Repo' + os.sep + 'css' + os.sep + link.split('/')[-1], 'w', encoding='utf-8') as css:
             css.write(sheet.text)
 
     return sheets
@@ -118,8 +118,9 @@ def save_pages(css_links):
     '''
     cwd = os.getcwd()
     ## Build the new header data
+    sep = os.sep
     for i, link in enumerate(css_links):
-        css_links[i] = cwd + '\\BBC_Food_Repo\\css\\' + link.split('/')[-1]
+        css_links[i] = cwd + sep + 'BBC_Food_Repo' + sep + 'css' + sep + link.split('/')[-1]
 
     ## Cycle through the sitemap grabbing each recipe
     with open('bbc_sitemap.txt', 'r') as f:
@@ -180,19 +181,15 @@ def save_pages(css_links):
             ## Convert the soup back into html and save it to file
             html = soup.prettify()
 
-            with open('BBC_Food_Repo/' + line.split('/')[-1] + '.html', 'w', encoding='utf-8-sig') as html_page:
+            with io.open('BBC_Food_Repo/' + line.split('/')[-1] + '.html', 'w', encoding='utf-8-sig') as html_page:
                 html_page.write(html)
 
 
 def main():
     get_sitemap()
-
     make_repodir()
-
     stylesheets = get_stylesheets()
-
     save_pages(stylesheets)
-
 
 if __name__ == '__main__':
     main()
